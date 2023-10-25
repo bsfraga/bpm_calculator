@@ -32,14 +32,20 @@ jobs:
     - name: Upload Executable as Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: your-executable
+        name: main.exe
         path: ./dist/main.exe
 
-    - name: Create GitHub Release
-      uses: gh-actions/create-release@master
+    - name: Download Executable Artifact
+      uses: actions/download-artifact@v2
       with:
+        name: main.exe
+        path: ./dist/
+
+    - name: Create Release and Upload Executable
+      uses: gh-release/gh-release@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        name: Release ${{ github.sha }}
         tag_name: ${{ github.sha }}
-        release_name: Release ${{ github.sha }}
         body: Auto-generated release from ${{ github.sha }}
-        draft: false
-        prerelease: false
+        files: ./dist/main.exe
