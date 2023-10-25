@@ -73,5 +73,5 @@ This project is authored and maintained by [Bruno Schuster Fraga](mailto:brunofr
 
 ## TODO:
 
-- [ ] Add a GitHub Actions workflow to build a executable.
+- [X] Add a GitHub Actions workflow to build a executable.
 - [ ] Add a functionality to manage playlists as they are downloaded and calculated.
