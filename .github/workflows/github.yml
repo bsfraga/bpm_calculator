@@ -27,25 +27,28 @@ jobs:
     - name: Create Executable
       run: |
         pip install pyinstaller
-        pyinstaller --onefile main.py 
+        pyinstaller --onefile main.py
 
     - name: Upload Executable as Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: main.exe
+        name: your-executable
         path: ./dist/main.exe
 
-    - name: Download Executable Artifact
-      uses: actions/download-artifact@v2
+    - name: Create Release
+      id: create_release
+      uses: gh-actions/create-release@v1
       with:
-        name: main.exe
-        path: ./dist/
-
-    - name: Create Release and Upload Executable
-      uses: gh-release/gh-release@v2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        name: Release ${{ github.sha }}
         tag_name: ${{ github.sha }}
+        release_name: Release ${{ github.sha }}
         body: Auto-generated release from ${{ github.sha }}
-        files: ./dist/main.exe
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        asset_path: ./dist/main.exe
+        asset_name: main.exe
+        asset_content_type: application/octet-stream
