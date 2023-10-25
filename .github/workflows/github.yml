@@ -27,10 +27,10 @@ jobs:
     - name: Create Executable
       run: |
         pip install pyinstaller
-        pyinstaller --onefile your_script.py  # Replace 'your_script.py' with the name of your main Python script
+        pyinstaller --onefile main.py 
 
     - name: Upload Executable
       uses: actions/upload-artifact@v2
       with:
         name: your-executable
-        path: ./dist/your_script  # Replace 'your_script' with the name of your main Python script without the '.py' extension
+        path: ./dist/main.exe
