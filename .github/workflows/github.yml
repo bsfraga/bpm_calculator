@@ -7,7 +7,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -27,28 +26,12 @@ jobs:
     - name: Create Executable
       run: |
         pip install pyinstaller
-        pyinstaller --onefile main.py
+        pyinstaller --onefile main.py 
 
-    - name: Upload Executable as Artifact
-      uses: actions/upload-artifact@v2
+    - name: Create Release and Upload Executable
+      uses: Hs1r1us/Release-AIO@v2.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: your-executable
-        path: ./dist/main.exe
-
-    - name: Create Release
-      id: create_release
-      uses: gh-actions/create-release@v1
-      with:
-        tag_name: ${{ github.sha }}
-        release_name: Release ${{ github.sha }}
-        body: Auto-generated release from ${{ github.sha }}
-        draft: false
-        prerelease: false
-
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} 
-        asset_path: ./dist/main.exe
-        asset_name: main.exe
-        asset_content_type: application/octet-stream
+        tag_name: ${{ github.ref }}
+        asset_files: './dist/main.exe'
