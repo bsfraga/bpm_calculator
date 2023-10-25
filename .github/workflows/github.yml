@@ -1,4 +1,4 @@
-name: Build Executable
+name: Build Executable and Create Release
 
 on:
   pull_request:
@@ -29,8 +29,17 @@ jobs:
         pip install pyinstaller
         pyinstaller --onefile main.py 
 
-    - name: Upload Executable
+    - name: Upload Executable as Artifact
       uses: actions/upload-artifact@v2
       with:
         name: your-executable
         path: ./dist/main.exe
+
+    - name: Create GitHub Release
+      uses: gh-actions/create-release@master
+      with:
+        tag_name: ${{ github.sha }}
+        release_name: Release ${{ github.sha }}
+        body: Auto-generated release from ${{ github.sha }}
+        draft: false
+        prerelease: false
