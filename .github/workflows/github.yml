@@ -32,6 +32,11 @@ jobs:
         id: get-path
         run: |
           echo "::set-output name=path::$(find . -name ./dist/main.exe)"
+
+      - name: Extract Tag Name
+        id: extract-tag
+        run: echo "::set-output name=tag::${GITHUB_REF/refs\/tags\//}"
+        shell: bash
           
   release:
     needs: build
@@ -46,8 +51,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ steps.extract-tag.outputs.tag }}
+          release_name: Release ${{ steps.extract-tag.outputs.tag }}
       
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
