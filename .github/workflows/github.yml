@@ -1,4 +1,4 @@
-name: Build Executable and Create Release
+name: CI/CD Pipeline
 
 on:
   pull_request:
@@ -6,32 +6,45 @@ on:
       - master
 
 jobs:
+  
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+  
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+  
+      - name: Create Executable
+        run: |
+          pip install pyinstaller
+          pyinstaller --onefile main.py 
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    - name: Create Executable
-      run: |
-        pip install pyinstaller
-        pyinstaller --onefile main.py 
-
-    - name: Create Release and Upload Executable
-      uses: Hs1r1us/Release-AIO@v2.0.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        asset_files: './dist/main.exe'
+      - name: Get Executable Path
+        id: get-path
+        run: |
+          echo "::set-output name=path::$(find . -name ./dist/main.exe)"
+          
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        
+      - name: Update Release
+        uses: gh-actions/gh-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          asset_path: ${{ steps.get-path.outputs.path }}
+          asset_name: your-executable-name
+          asset_content_type: application/octet-stream
